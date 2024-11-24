@@ -1,0 +1,12 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+header .inner a.button {
+  display: none;
+}
+
+aside#sidebar {
+  display: none;
+}

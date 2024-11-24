@@ -1,0 +1,18 @@
+title: Helmuth's Tech Blog
+description: Solutions Architecture, Kubernetes, Cloud, ML, and GenAI
+theme: jekyll-theme-architect
+url: "https://blog.helmuth.at"
+baseurl: ""
+repository: helmuthb/helmuthb.github.io
+author: Helmuth
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Social links
+github_username: helmuthb
+linkedin_username: helmuthbreitenfellner
+
+# Build settings
+markdown: kramdown
+permalink: /:year/:month/:title/
