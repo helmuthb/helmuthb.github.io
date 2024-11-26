@@ -1,11 +1,11 @@
 ---
 layout: post
-title: "k0s on NetCup Part 3: Adding Longhorn Storage"
+title: "Adding Longhorn Storage to a k0s Cluster"
 date: 2024-11-25
 categories: kubernetes storage
 ---
 
-# k0s on NetCup Part 3: Adding Longhorn Storage
+# Adding Longhorn Storage to a k0s Cluster
 
 After setting up our k0s cluster and configuring ingress in the previous posts, let's add persistent storage capabilities using [Longhorn](https://longhorn.io/). Longhorn is a lightweight and reliable distributed block storage system, perfect for our k0s cluster.
 

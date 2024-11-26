@@ -1,11 +1,11 @@
 ---
 layout: post
-title: "Adding an ingress controller to a k0s cluster"
+title: "Adding an Ingress Controller to a k0s Cluster"
 date: 2024-11-24
 categories: kubernetes cloud
 ---
 
-# Adding an ingress controller to a k0s cluster
+# Adding an Ingress Controller to a k0s Cluster
 
 Without an ingress controller, we can't expose our services to the internet.
 

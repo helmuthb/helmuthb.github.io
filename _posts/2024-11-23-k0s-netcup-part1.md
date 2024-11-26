@@ -1,11 +1,11 @@
 ---
 layout: post
-title: "Setting up a k0s cluster on netcup"
+title: "Setting up a k0s Cluster on netcup"
 date: 2024-11-23
 categories: kubernetes cloud
 ---
 
-# Setting up a k0s cluster on netcup
+# Setting up a k0s Cluster on netcup
 
 For experiments and learning purposes I always look for various ways to run Kubernetes workloads.
 The easiest way is using a cloud provider and their Kubernetes service, but experimenting with various Kubernetes distributions is valuable as well.
