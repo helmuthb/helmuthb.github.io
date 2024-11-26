@@ -126,9 +126,116 @@ kubectl create -f letsencrypt-dev.yml
 kubectl create -f letsencrypt-prod.yml
 ```
 
+### 4. Prepare DNS records
+
+I'm assuming you have a public domain under your control, like `helmuth.at`.
+
+For the ingress I created a set of A records for the name `k0s-cluster.helmuth.at`, pointing to the three IP addresses of the nodes.
+
+```
+k0s-cluster A 1.2.3.1
+k0s-cluster A 1.2.3.2
+k0s-cluster A 1.2.3.3
+```
+
+Now for each hostname on the cluser I will just use a CNAME to `k0s-cluster.helmuth.at`, and that will give me a DNS-based load balancing of the three nodes.
+
+_A DNS-based load balancing is a suboptimal option, as it depends on clients' behavior._
+_But since we don't have a real load balancer in front of the nodes it's the best we can achieve._
+
+### 5. Test the ingress and cert-manager
+
+For a quick test we will create a CNAME `apache.helmuth.at` pointing to `k0s-cluster.helmuth.at`:
+
+```
+apache CNAME k0s-cluster.helmuth.at
+```
+
+Next we create a simple `apache` pod (no need for a deployment here as we just want to test the ingress controller) with a service attached to it:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: apache
+  labels:
+    app: apache
+spec:
+  containers:
+  - name: apache
+    image: httpd:2.4
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apache
+spec:
+  selector:
+    app: apache
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP
+```
+
+Save this as `apache.yaml` and apply:
+
+```bash
+kubectl apply -f apache.yaml
+```
+
+With the service created, we can now add an ingress rule to the ingress controller:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apache-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dev
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: apache.helmuth.at
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: apache
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - apache.helmuth.at
+    secretName: apache-tls
+```
+
+Wait maybe a minute, and then using an incognito tab in your browser, try to access `apache.helmuth.at` and check that the certificate is from the Let's Encrypt staging server.
+
+_This means the browser won't trust it, but that's fine for now._
+
+You should see on the certificate the issuer _Common Name_ `(STAGING) Wannabe Watercress R11` and the issuer _Organization_ `(STAGING) Let's Encrypt`.
+
+If that is working we can update the ingress rule to use the production issuer:
+
+```yaml
+...
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+...
+```
+
+Again, after a minute, when we now try to access the ingress in a new incognito tab, we should see no warnings from the browser, and a "It works!" message from our Apache web server.
+
+_Why incognito tabs? The browser might cache the certificate. As we were using a staging certificate first, we did not want it to cache it._
+
 ## Next Steps
 
-We have a Kubernetes cluster with an ingress controller and a cert-manager setup.
+We have a Kubernetes cluster with an ingress controller and a cert-manager setup, and it works!
 
 In the next post we will add [Longhorn](https://longhorn.io/) to our cluster for persistent storage.
 
